@@ -1,34 +1,43 @@
-<script>
-if (!localStorage.getItem("loggedIn")) {
-    window.location.href = "login.html";
-}
-</script>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Department Management</title>
+    <title>Login</title>
 </head>
 <body>
 
-<h1>Department Management</h1>
+<h2>Admin Login</h2>
 
-<h2>Add Department</h2>
-<input type="text" id="name" placeholder="Department Name">
-<input type="text" id="description" placeholder="Description">
-<button onclick="addDepartment()">Add</button>
+<input type="text" id="username" placeholder="Username">
+<input type="password" id="password" placeholder="Password">
+<button onclick="login()">Login</button>
 
-<h2>Departments</h2>
-<ul id="departmentList"></ul>
+<p id="error" style="color:red;"></p>
 
-<script src="script.js"></script>
+<script>
+const API_URL = "http://127.0.0.1:5000";
+
+function login() {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    fetch(`${API_URL}/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json"
+        },
+        body: JSON.stringify({ username, password })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status) {
+            localStorage.setItem("loggedIn", "true");
+            window.location.href = "index.html";
+        } else {
+            document.getElementById("error").innerText = "Invalid login";
+        }
+    });
+}
+</script>
 
 </body>
 </html>
-<button onclick="logout()">Logout</button>
-
-<script>
-function logout() {
-    localStorage.removeItem("loggedIn");
-    window.location.href = "login.html";
-}
-</script>
