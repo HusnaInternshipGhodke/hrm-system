@@ -31,7 +31,7 @@ function login() {
     .then(data => {
         if (data.status) {
             localStorage.setItem("loggedIn", "true");
-            window.location.href = "index.html";
+            window.location.href = "department.html";
         } else {
             document.getElementById("error").innerText = "Invalid login";
         }
