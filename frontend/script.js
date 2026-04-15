@@ -1,5 +1,4 @@
-const API_URL = "http://127.0.0.1:5000";
-
+const API_URL = "https://hrm-system-eu3z.onrender.com";
 let editId = null; // ✅ MUST be at top
 
 // Add / Update Department
