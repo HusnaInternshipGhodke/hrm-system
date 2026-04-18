@@ -19,6 +19,19 @@ if (!localStorage.getItem("loggedIn")) {
 
 <ul id="departmentList"></ul>
 
+<hr>
+
+<!-- ✅ ROLE MANAGEMENT START -->
+<h2>Role Management</h2>
+
+<input type="text" id="roleName" placeholder="Role Name">
+<input type="text" id="roleDesc" placeholder="Description">
+<button onclick="addRole()">Add Role</button>
+
+<ul id="roleList"></ul>
+<!-- ✅ ROLE MANAGEMENT END -->
+
+<br><br>
 <button onclick="logout()">Logout</button>
 
 <script src="script.js"></script>
