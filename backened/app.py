@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-
+import os   #
 app = Flask(__name__)
 CORS(app)
 
@@ -74,3 +74,6 @@ def restore_role(id):
         if r['id'] == id:
             r['status'] = True
     return jsonify({"message": "Role restored"})
+
+if __name__ == '__main__':
+    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
