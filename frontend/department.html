@@ -1,30 +1,27 @@
-<script>
-if (!localStorage.getItem("loggedIn")) {
-    window.location.href = "login.html";
-}
-</script>
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Department Management</title>
+    <title>Department</title>
 </head>
 <body>
 
+<script>
+if (!localStorage.getItem("loggedIn")) {
+    window.location.href = "index.html";
+}
+</script>
+
 <h1>Department Management</h1>
 
-<h2>Add Department</h2>
 <input type="text" id="name" placeholder="Department Name">
 <input type="text" id="description" placeholder="Description">
 <button onclick="addDepartment()">Add</button>
 
-<h2>Departments</h2>
 <ul id="departmentList"></ul>
 
-<script src="script.js"></script>
-
-</body>
-</html>
 <button onclick="logout()">Logout</button>
+
+<script src="script.js"></script>
 
 <script>
 function logout() {
@@ -32,3 +29,6 @@ function logout() {
     window.location.href = "index.html";
 }
 </script>
+
+</body>
+</html>

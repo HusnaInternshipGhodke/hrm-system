@@ -1,5 +1,5 @@
 const API_URL = "https://hrm-system-eu3z.onrender.com";
-let editId = null; // ✅ MUST be at top
+let editId = null;
 
 // Add / Update Department
 function addDepartment() {
@@ -7,7 +7,6 @@ function addDepartment() {
     const description = document.getElementById("description").value;
 
     if (editId !== null) {
-        // UPDATE
         fetch(`${API_URL}/update-department/${editId}`, {
             method: "PUT",
             headers: {
@@ -20,9 +19,7 @@ function addDepartment() {
             editId = null;
             getDepartments();
         });
-
     } else {
-        // ADD
         fetch(`${API_URL}/add-department`, {
             method: "POST",
             headers: {
@@ -63,24 +60,21 @@ function getDepartments() {
 
             list.appendChild(li);
         });
-    })
-    .catch(err => console.log(err));
+    });
 }
 
 // Delete
 function deleteDepartment(id) {
     fetch(`${API_URL}/delete-department/${id}`, {
         method: "PUT"
-    })
-    .then(() => getDepartments());
+    }).then(() => getDepartments());
 }
 
 // Restore
 function restoreDepartment(id) {
     fetch(`${API_URL}/restore-department/${id}`, {
         method: "PUT"
-    })
-    .then(() => getDepartments());
+    }).then(() => getDepartments());
 }
 
 // Edit
@@ -92,3 +86,5 @@ function editDepartment(id, name, description) {
 
 // Load data
 getDepartments();
+
+
