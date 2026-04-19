@@ -1,12 +1,19 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
-import random
 
 app = Flask(__name__)
 
-# ✅ FIXED CORS (important)
-CORS(app, resources={r"/*": {"origins": "*"}})
+# ✅ CORS FIX (important)
+CORS(app)
+
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS')
+    return response
+
 
 # ================= DATA =================
 departments = []
@@ -20,7 +27,6 @@ admin_data = {
     "email": "ghodkehusna95@gmail.com"
 }
 
-otp_store = {}
 
 # ================= LOGIN =================
 @app.route('/login', methods=['POST'])
@@ -35,45 +41,33 @@ def login():
 
 # ================= FORGOT PASSWORD =================
 
-@app.route('/send-otp', methods=['POST', 'OPTIONS'])
+@app.route('/send-otp', methods=['POST'])
 def send_otp():
-    if request.method == 'OPTIONS':
-        return jsonify({"message": "ok"}), 200
-
     data = request.get_json()
     email = data.get("email")
 
     if email != admin_data["email"]:
-        return jsonify({"status": False, "message": "Email not found"}), 400
+        return jsonify({"status": False, "message": "Email not found"})
 
-    otp = str(random.randint(1000, 9999))
-    otp_store[email] = otp
-
-    print("OTP:", otp)   # 👈 CHECK THIS IN RENDER LOGS
+    otp = "1234"   # demo OTP
+    print("OTP:", otp)   # 👈 check in Render logs
 
     return jsonify({"status": True})
 
 
-@app.route('/verify-otp', methods=['POST', 'OPTIONS'])
+@app.route('/verify-otp', methods=['POST'])
 def verify_otp():
-    if request.method == 'OPTIONS':
-        return jsonify({"message": "ok"}), 200
-
     data = request.get_json()
-    email = data.get("email")
     otp = data.get("otp")
 
-    if otp_store.get(email) == otp:
+    if otp == "1234":
         return jsonify({"status": True})
 
     return jsonify({"status": False})
 
 
-@app.route('/reset-password', methods=['POST', 'OPTIONS'])
+@app.route('/reset-password', methods=['POST'])
 def reset_password():
-    if request.method == 'OPTIONS':
-        return jsonify({"message": "ok"}), 200
-
     data = request.get_json()
     new_password = data.get("newPassword")
 
@@ -236,3 +230,4 @@ def update_employee(id):
 # ================= RUN =================
 if __name__ == '__main__':
     app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
+    
