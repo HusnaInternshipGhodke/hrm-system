@@ -9,6 +9,8 @@ CORS(app)
 @app.route('/login', methods=['POST'])
 def login():
     try:
+
+        
         data = request.get_json()
         username = data.get("username")
         password = data.get("password")
