@@ -1,24 +1,85 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
 import os
+import random
 
 app = Flask(__name__)
-CORS(app)
+
+# ✅ FIXED CORS (important)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 # ================= DATA =================
 departments = []
 roles = []
 employees = []
 
+# ================= ADMIN =================
+admin_data = {
+    "username": "admin",
+    "password": "1234",
+    "email": "ghodkehusna95@gmail.com"
+}
+
+otp_store = {}
+
 # ================= LOGIN =================
 @app.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
 
-    if data.get('username') == "admin" and data.get('password') == "1234":
+    if data.get('username') == admin_data["username"] and data.get('password') == admin_data["password"]:
         return jsonify({"status": True})
     
     return jsonify({"status": False})
+
+
+# ================= FORGOT PASSWORD =================
+
+@app.route('/send-otp', methods=['POST', 'OPTIONS'])
+def send_otp():
+    if request.method == 'OPTIONS':
+        return jsonify({"message": "ok"}), 200
+
+    data = request.get_json()
+    email = data.get("email")
+
+    if email != admin_data["email"]:
+        return jsonify({"status": False, "message": "Email not found"}), 400
+
+    otp = str(random.randint(1000, 9999))
+    otp_store[email] = otp
+
+    print("OTP:", otp)   # 👈 CHECK THIS IN RENDER LOGS
+
+    return jsonify({"status": True})
+
+
+@app.route('/verify-otp', methods=['POST', 'OPTIONS'])
+def verify_otp():
+    if request.method == 'OPTIONS':
+        return jsonify({"message": "ok"}), 200
+
+    data = request.get_json()
+    email = data.get("email")
+    otp = data.get("otp")
+
+    if otp_store.get(email) == otp:
+        return jsonify({"status": True})
+
+    return jsonify({"status": False})
+
+
+@app.route('/reset-password', methods=['POST', 'OPTIONS'])
+def reset_password():
+    if request.method == 'OPTIONS':
+        return jsonify({"message": "ok"}), 200
+
+    data = request.get_json()
+    new_password = data.get("newPassword")
+
+    admin_data["password"] = new_password
+
+    return jsonify({"status": True})
 
 
 # ================= DEPARTMENT =================
