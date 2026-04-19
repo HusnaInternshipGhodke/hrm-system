@@ -111,7 +111,67 @@ def restore_role(id):
         if r['id'] == id:
             r['status'] = True
     return jsonify({"message": "Role restored"})
+# ---------------- EMPLOYEE ---------------- #
 
+employees = []
+
+# Get all employees
+@app.route('/all-employees', methods=['GET'])
+def all_employees():
+    return jsonify(employees)
+
+# Add employee
+@app.route('/add-employee', methods=['POST'])
+def add_employee():
+    data = request.get_json()
+
+    new_emp = {
+        "id": len(employees) + 1,
+        "first_name": data.get("first_name"),
+        "last_name": data.get("last_name"),
+        "email": data.get("email"),
+        "mobile": data.get("mobile"),
+        "department": data.get("department"),
+        "role": data.get("role"),
+        "manager": data.get("manager"),
+        "status": True
+    }
+
+    employees.append(new_emp)
+    return jsonify({"message": "Employee added"})
+
+# Update employee
+@app.route('/update-employee/<int:id>', methods=['PUT'])
+def update_employee(id):
+    data = request.get_json()
+
+    for e in employees:
+        if e['id'] == id:
+            e['first_name'] = data.get("first_name")
+            e['last_name'] = data.get("last_name")
+            e['email'] = data.get("email")
+            e['mobile'] = data.get("mobile")
+            e['department'] = data.get("department")
+            e['role'] = data.get("role")
+            e['manager'] = data.get("manager")
+
+    return jsonify({"message": "Employee updated"})
+
+# Delete employee
+@app.route('/delete-employee/<int:id>', methods=['PUT'])
+def delete_employee(id):
+    for e in employees:
+        if e['id'] == id:
+            e['status'] = False
+    return jsonify({"message": "Employee deleted"})
+
+# Restore employee
+@app.route('/restore-employee/<int:id>', methods=['PUT'])
+def restore_employee(id):
+    for e in employees:
+        if e['id'] == id:
+            e['status'] = True
+    return jsonify({"message": "Employee restored"})
 
 # ================= RUN =================
 if __name__ == '__main__':
