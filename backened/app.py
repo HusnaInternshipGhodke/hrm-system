@@ -174,6 +174,14 @@ def restore_employee(id):
         if e['id'] == id:
             e['status'] = True
     return jsonify({"message": "Employee restored"})
+@app.route('/update-role/<int:id>', methods=['PUT'])
+def update_role(id):
+    data = request.get_json()
+    for r in roles:
+        if r['id'] == id:
+            r['name'] = data.get("name")
+            r['description'] = data.get("description")
+    return jsonify({"message": "Role updated"})
 
 # ================= RUN =================
 if __name__ == '__main__':
