@@ -1,3 +1,4 @@
+alert("JS LOADED");
 const BASE_URL = "https://hrm-system-eu3z.onrender.com";
 
 // ==============================
@@ -92,4 +93,28 @@ async function updateTaskStatus(id, status) {
     });
 
     loadTasks();
+}
+
+function addDepartment() {
+    const name = document.getElementById("name").value;
+    const desc = document.getElementById("description").value;
+
+    const li = `<li>${name} - ${desc}</li>`;
+    document.getElementById("departmentList").innerHTML += li;
+}
+
+function addRole() {
+    const name = document.getElementById("roleName").value;
+    const desc = document.getElementById("roleDesc").value;
+
+    const li = `<li>${name} - ${desc}</li>`;
+    document.getElementById("roleList").innerHTML += li;
+}
+
+function addEmployee() {
+    const fname = document.getElementById("firstName").value;
+    const lname = document.getElementById("lastName").value;
+
+    const li = `<li>${fname} ${lname}</li>`;
+    document.getElementById("employeeList").innerHTML += li;
 }
