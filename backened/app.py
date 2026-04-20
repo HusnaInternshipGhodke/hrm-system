@@ -43,17 +43,17 @@ def home():
 # -------------------------
 # LOGIN
 # -------------------------
+
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
     username = data.get("username")
     password = data.get("password")
 
-    if username == "admin" and password == "1234":
+    if username in users and users[username]["password"] == password:
         return jsonify({"message": "Login successful"}), 200
 
     return jsonify({"message": "Invalid credentials"}), 401
-
 
 # -------------------------
 # SEND OTP
