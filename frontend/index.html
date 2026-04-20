@@ -7,34 +7,43 @@
 
 <h2>Admin Login</h2>
 
-<input type="text" id="username" placeholder="Username">
-<input type="password" id="password" placeholder="Password">
+<input id="username" placeholder="Username"><br><br>
+<input id="password" type="password" placeholder="Password"><br><br>
+
 <button onclick="login()">Login</button>
+<button onclick="goToForgot()">Forgot Password?</button>
+
+<!-- ✅ ADDED (as per PDF) -->
+<p><a href="forgot.html">Forgot Password?</a></p>
 
 <p id="error" style="color:red;"></p>
 
 <script>
 const API_URL = "https://hrm-system-eu3z.onrender.com";
+function goToForgot() {
+    window.location.href = "forgot.html";
+}
 
 function login() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
     fetch(`${API_URL}/login`, {
         method: "POST",
-        headers: {
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ username, password })
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value
+        })
     })
     .then(res => res.json())
     .then(data => {
         if (data.status) {
-            localStorage.setItem("loggedIn", "true");
+            localStorage.setItem("login", "true");
             window.location.href = "department.html";
         } else {
             document.getElementById("error").innerText = "Invalid login";
         }
+    })
+    .catch(() => {
+        document.getElementById("error").innerText = "Server error";
     });
 }
 </script>

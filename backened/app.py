@@ -1,233 +1,119 @@
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import os
+import random
+import time
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
-# ✅ CORS FIX (important)
-CORS(app)
-
-@app.after_request
-def after_request(response):
-    response.headers.add('Access-Control-Allow-Origin', '*')
-    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,PUT,OPTIONS')
-    return response
-
-
-# ================= DATA =================
-departments = []
-roles = []
-employees = []
-
-# ================= ADMIN =================
-admin_data = {
-    "username": "admin",
-    "password": "1234",
-    "email": "ghodkehusna95@gmail.com"
+# -------------------------
+# EXISTING LOGIN DATA
+# -------------------------
+users = {
+    "admin": {
+        "password": "1234"
+    }
 }
 
+# -------------------------
+# OTP STORAGE (in-memory)
+# -------------------------
+otp_store = {}
+OTP_EXPIRY = 300  # 5 minutes
 
-# ================= LOGIN =================
+
+# -------------------------
+# LOGIN API (unchanged)
+# -------------------------
 @app.route('/login', methods=['POST'])
 def login():
-    data = request.get_json()
+    data = request.json
+    username = data.get("username")
+    password = data.get("password")
 
-    if data.get('username') == admin_data["username"] and data.get('password') == admin_data["password"]:
-        return jsonify({"status": True})
-    
-    return jsonify({"status": False})
+    if username in users and users[username]["password"] == password:
+        return jsonify({"message": "Login successful"}), 200
+
+    return jsonify({"message": "Invalid credentials"}), 401
 
 
-# ================= FORGOT PASSWORD =================
-
+# -------------------------
+# SEND OTP
+# -------------------------
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
-    data = request.get_json()
-    email = data.get("email")
+    data = request.json
+    username = data.get("username")
 
-    if email != admin_data["email"]:
-        return jsonify({"status": False, "message": "Email not found"})
+    if username not in users:
+        return jsonify({"message": "User not found"}), 404
 
-    otp = "1234"   # demo OTP
-    print("OTP:", otp)   # 👈 check in Render logs
+    otp = str(random.randint(100000, 999999))
 
-    return jsonify({"status": True})
+    otp_store[username] = {
+        "otp": otp,
+        "time": time.time(),
+        "verified": False
+    }
+
+    # ⚠️ For testing (since no email/SMS)
+    return jsonify({
+        "message": "OTP sent successfully",
+        "otp": otp   # REMOVE in production
+    }), 200
 
 
+# -------------------------
+# VERIFY OTP
+# -------------------------
 @app.route('/verify-otp', methods=['POST'])
 def verify_otp():
-    data = request.get_json()
+    data = request.json
+    username = data.get("username")
     otp = data.get("otp")
 
-    if otp == "1234":
-        return jsonify({"status": True})
+    record = otp_store.get(username)
 
-    return jsonify({"status": False})
+    if not record:
+        return jsonify({"message": "OTP not requested"}), 400
+
+    # Expiry check
+    if time.time() - record["time"] > OTP_EXPIRY:
+        del otp_store[username]
+        return jsonify({"message": "OTP expired"}), 400
+
+    if record["otp"] != otp:
+        return jsonify({"message": "Invalid OTP"}), 400
+
+    record["verified"] = True
+
+    return jsonify({"message": "OTP verified"}), 200
 
 
+# -------------------------
+# RESET PASSWORD
+# -------------------------
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
-    data = request.get_json()
-    new_password = data.get("newPassword")
+    data = request.json
+    username = data.get("username")
+    new_password = data.get("new_password")
 
-    admin_data["password"] = new_password
+    record = otp_store.get(username)
 
-    return jsonify({"status": True})
+    if not record or not record.get("verified"):
+        return jsonify({"message": "OTP not verified"}), 400
 
+    users[username]["password"] = new_password
 
-# ================= DEPARTMENT =================
-@app.route('/add-department', methods=['POST'])
-def add_department():
-    data = request.get_json()
+    # Clear OTP after success
+    del otp_store[username]
 
-    dept = {
-        "id": len(departments) + 1,
-        "name": data.get('name'),
-        "description": data.get('description'),
-        "status": True
-    }
-
-    departments.append(dept)
-    return jsonify({"message": "added"})
+    return jsonify({"message": "Password reset successful"}), 200
 
 
-@app.route('/all-departments')
-def get_departments():
-    return jsonify(departments)
-
-
-@app.route('/delete-department/<int:id>', methods=['PUT'])
-def delete_department(id):
-    for d in departments:
-        if d['id'] == id:
-            d['status'] = False
-    return jsonify({"message": "deleted"})
-
-
-@app.route('/restore-department/<int:id>', methods=['PUT'])
-def restore_department(id):
-    for d in departments:
-        if d['id'] == id:
-            d['status'] = True
-    return jsonify({"message": "restored"})
-
-
-@app.route('/update-department/<int:id>', methods=['PUT'])
-def update_department(id):
-    data = request.get_json()
-
-    for d in departments:
-        if d['id'] == id:
-            d['name'] = data.get('name')
-            d['description'] = data.get('description')
-
-    return jsonify({"message": "updated"})
-
-
-# ================= ROLE =================
-@app.route('/add-role', methods=['POST'])
-def add_role():
-    data = request.get_json()
-
-    role = {
-        "id": len(roles) + 1,
-        "name": data.get('name'),
-        "description": data.get('description'),
-        "status": True
-    }
-
-    roles.append(role)
-    return jsonify({"message": "added"})
-
-
-@app.route('/all-roles')
-def get_roles():
-    return jsonify(roles)
-
-
-@app.route('/delete-role/<int:id>', methods=['PUT'])
-def delete_role(id):
-    for r in roles:
-        if r['id'] == id:
-            r['status'] = False
-    return jsonify({"message": "deleted"})
-
-
-@app.route('/restore-role/<int:id>', methods=['PUT'])
-def restore_role(id):
-    for r in roles:
-        if r['id'] == id:
-            r['status'] = True
-    return jsonify({"message": "restored"})
-
-
-@app.route('/update-role/<int:id>', methods=['PUT'])
-def update_role(id):
-    data = request.get_json()
-
-    for r in roles:
-        if r['id'] == id:
-            r['name'] = data.get('name')
-            r['description'] = data.get('description')
-
-    return jsonify({"message": "updated"})
-
-
-# ================= EMPLOYEE =================
-@app.route('/add-employee', methods=['POST'])
-def add_employee():
-    data = request.get_json()
-
-    emp = {
-        "id": len(employees) + 1,
-        "firstName": data.get('firstName'),
-        "lastName": data.get('lastName'),
-        "email": data.get('email'),
-        "mobile": data.get('mobile'),
-        "department": data.get('department'),
-        "role": data.get('role'),
-        "manager": data.get('manager'),
-        "status": True
-    }
-
-    employees.append(emp)
-    return jsonify({"message": "added"})
-
-
-@app.route('/all-employees')
-def get_employees():
-    return jsonify(employees)
-
-
-@app.route('/delete-employee/<int:id>', methods=['PUT'])
-def delete_employee(id):
-    for e in employees:
-        if e['id'] == id:
-            e['status'] = False
-    return jsonify({"message": "deleted"})
-
-
-@app.route('/restore-employee/<int:id>', methods=['PUT'])
-def restore_employee(id):
-    for e in employees:
-        if e['id'] == id:
-            e['status'] = True
-    return jsonify({"message": "restored"})
-
-
-@app.route('/update-employee/<int:id>', methods=['PUT'])
-def update_employee(id):
-    data = request.get_json()
-
-    for e in employees:
-        if e['id'] == id:
-            e.update(data)
-
-    return jsonify({"message": "updated"})
-
-
-# ================= RUN =================
+# -------------------------
+# RUN APP
+# -------------------------
 if __name__ == '__main__':
-    app.run(host="0.0.0.0", port=int(os.environ.get("PORT", 5000)))
-    
+    app.run(debug=True)

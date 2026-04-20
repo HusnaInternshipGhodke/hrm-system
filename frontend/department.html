@@ -1,7 +1,7 @@
 <h1>Department Management</h1>
 
-<input type="text" id="name" placeholder="Department Name">
-<input type="text" id="description" placeholder="Description">
+<input id="name" placeholder="Department Name">
+<input id="description" placeholder="Description">
 <button onclick="addDepartment()">Add</button>
 
 <ul id="departmentList"></ul>
@@ -10,34 +10,30 @@
 
 <h2>Role Management</h2>
 
-<input type="text" id="roleName" placeholder="Role Name">
-<input type="text" id="roleDesc" placeholder="Description">
+<input id="roleName" placeholder="Role Name">
+<input id="roleDesc" placeholder="Description">
 <button onclick="addRole()">Add Role</button>
 
 <ul id="roleList"></ul>
+
 <hr>
 
 <h2>Employee Management</h2>
 
-<input type="text" id="firstName" placeholder="First Name">
-<input type="text" id="lastName" placeholder="Last Name">
-<input type="text" id="email" placeholder="Email">
-<input type="text" id="mobile" placeholder="Mobile">
+<input id="firstName" placeholder="First Name">
+<input id="lastName" placeholder="Last Name">
+<input id="email" placeholder="Email">
+<input id="mobile" placeholder="Mobile">
 
-<br><br>
+<select id="department"></select>
+<select id="role"></select>
 
-<select id="departmentDropdown"></select>
-<select id="roleDropdown"></select>
-
-<br><br>
-
-<input type="text" id="manager" placeholder="Manager">
-
-<br><br>
+<input id="manager" placeholder="Manager">
 
 <button onclick="addEmployee()">Save Employee</button>
 
 <ul id="employeeList"></ul>
 
 <button onclick="logout()">Logout</button>
+
 <script src="script.js"></script>
