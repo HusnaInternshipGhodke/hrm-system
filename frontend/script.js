@@ -1,3 +1,4 @@
+console.log("updated");
 alert("JS LOADED");
 const BASE_URL = "https://hrm-system-eu3z.onrender.com";
 
