@@ -18,12 +18,12 @@ function login() {
         } else {
             error.innerText = "Invalid login";
         }
-    });
+    })
 }
 
 // ✅ THIS WAS MISSING
 function goToForgot() {
-    window.location.href = "forgot.html";
+    window.location.href = "forgot.html"
 }
 </script>
 

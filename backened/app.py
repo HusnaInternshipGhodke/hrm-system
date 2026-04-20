@@ -107,7 +107,7 @@ def verify_otp():
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.json
-   @app.route('/reset-password', methods=['POST'])
+@app.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.json
     username = data.get("username")
