@@ -2,12 +2,13 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import random
 import time
+import os
 
 app = Flask(__name__)
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 # -------------------------
-# EXISTING LOGIN DATA
+# SAMPLE USER DATA
 # -------------------------
 users = {
     "admin": {
@@ -23,7 +24,15 @@ OTP_EXPIRY = 300  # 5 minutes
 
 
 # -------------------------
-# LOGIN API (unchanged)
+# HOME ROUTE (for Render check)
+# -------------------------
+@app.route('/')
+def home():
+    return "HRM Backend Running"
+
+
+# -------------------------
+# LOGIN API
 # -------------------------
 @app.route('/login', methods=['POST'])
 def login():
@@ -56,10 +65,10 @@ def send_otp():
         "verified": False
     }
 
-    # ⚠️ For testing (since no email/SMS)
+    # For testing (no email/SMS)
     return jsonify({
         "message": "OTP sent successfully",
-        "otp": otp   # REMOVE in production
+        "otp": otp
     }), 200
 
 
@@ -77,7 +86,7 @@ def verify_otp():
     if not record:
         return jsonify({"message": "OTP not requested"}), 400
 
-    # Expiry check
+    # Check expiry
     if time.time() - record["time"] > OTP_EXPIRY:
         del otp_store[username]
         return jsonify({"message": "OTP expired"}), 400
@@ -113,7 +122,8 @@ def reset_password():
 
 
 # -------------------------
-# RUN APP
+# RUN APP (Render compatible)
 # -------------------------
 if __name__ == '__main__':
-    app.run(debug=True)
+    port = int(os.environ.get("PORT", 5000))
+    app.run(host='0.0.0.0', port=port)
