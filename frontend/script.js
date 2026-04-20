@@ -1,37 +1,40 @@
-<script>
-const API_URL = "https://hrm-system-eu3z.onrender.com";
+const BASE_URL = "https://hrm-system-eu3z.onrender.com";
 
+// ==============================
+// LOGIN
+// ==============================
 function login() {
-    fetch(`${API_URL}/login`, {
+    const username = document.getElementById("username").value;
+    const password = document.getElementById("password").value;
+
+    fetch(BASE_URL + "/login", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({
-            username: username.value,
-            password: password.value
-        })
+        body: JSON.stringify({ username, password })
     })
     .then(res => res.json())
     .then(data => {
         if (data.status) {
             localStorage.setItem("login", "true");
-            window.location = "department.html";
+            window.location.href = "department.html";
         } else {
-            error.innerText = "Invalid login";
+            document.getElementById("error").innerText = data.message;
         }
     })
+    .catch(() => {
+        document.getElementById("error").innerText = "Server error";
+    });
 }
 
-// ✅ THIS WAS MISSING
+// FORGOT PASSWORD NAVIGATION
 function goToForgot() {
-    window.location.href = "forgot.html"
+    window.location.href = "forgot.html";
 }
-</script>
+
 
 // ==============================
-// TASK MODULE JS
+// TASK MODULE
 // ==============================
-
-const BASE_URL = "https://hrm-system-eu3z.onrender.com";
 
 // CREATE TASK
 async function createTask() {
@@ -68,7 +71,7 @@ async function loadTasks() {
         html += `
         <tr>
             <td>${t.task_title}</td>
-            <td>${t.task_priority}</td>
+            <td>${t.priority}</td>
             <td>${t.status}</td>
             <td>
                 <button onclick="updateTaskStatus(${t.assignment_id}, 'Completed')">Complete</button>

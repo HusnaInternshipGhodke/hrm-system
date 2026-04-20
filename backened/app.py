@@ -51,10 +51,15 @@ def login():
     password = data.get("password")
 
     if username in users and users[username]["password"] == password:
-        return jsonify({"message": "Login successful"}), 200
+        return jsonify({
+            "status": True,
+            "message": "Login successful"
+        }), 200
 
-    return jsonify({"message": "Invalid credentials"}), 401
-
+    return jsonify({
+        "status": False,
+        "message": "Invalid credentials"
+    }), 401
 # -------------------------
 # SEND OTP
 # -------------------------
