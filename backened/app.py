@@ -54,6 +54,7 @@ def login():
 
     return jsonify({"message": "Invalid credentials"}), 401
 
+
 # -------------------------
 # SEND OTP
 # -------------------------
@@ -102,11 +103,8 @@ def verify_otp():
 
 
 # -------------------------
-# RESET PASSWORD
+# RESET PASSWORD (FIXED - ONLY ONE FUNCTION)
 # -------------------------
-@app.route('/reset-password', methods=['POST'])
-def reset_password():
-    data = request.json
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.json
@@ -124,10 +122,10 @@ def reset_password():
     del otp_store[username]
 
     return jsonify({"message": "Password reset to 1234"})
-    
+
 
 # =====================================================
-# TASK MODULE (PDF BASED)
+# TASK MODULE
 # =====================================================
 
 # CREATE TASK
@@ -164,7 +162,7 @@ def create_task():
     return jsonify({"message": "Task created"})
 
 
-# GET TASKS WITH FILTER
+# GET TASKS
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
     status = request.args.get("status")
