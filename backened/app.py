@@ -15,7 +15,9 @@ users = {
         "password": "1234"
     }
 }
-
+departments = []
+roles = []
+employees = []
 # -------------------------
 # OTP STORAGE
 # -------------------------

@@ -119,3 +119,7 @@ function addEmployee() {
     const li = `<li>${fname} ${lname}</li>`;
     document.getElementById("employeeList").innerHTML += li;
 }
+function logout() {
+    localStorage.removeItem("login");
+    window.location.href = "index.html";
+}
