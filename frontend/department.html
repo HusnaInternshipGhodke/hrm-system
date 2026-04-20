@@ -1,3 +1,10 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Department</title>
+</head>
+<body>
+
 <h1>Department Management</h1>
 
 <input id="name" placeholder="Department Name">
@@ -6,7 +13,7 @@
 
 <ul id="departmentList"></ul>
 
-<hr
+<hr>
 
 <h2>Role Management</h2>
 
@@ -25,17 +32,26 @@
 <input id="email" placeholder="Email">
 <input id="mobile" placeholder="Mobile">
 
+<br><br>
+
 <select id="department"></select>
 <select id="role"></select>
 
+<br><br>
+
 <input id="manager" placeholder="Manager">
 
-<button onclicack="addEmployee()">Save Employee</button>
-<button onclick="window.location.href='task.html'">Go to Task Module</button>
+<br><br>
 
+<button onclick="addEmployee()">Save Employee</button>
+<button onclick="goToTask()">Go to Task Module</button>
 
 <ul id="employeeList"></ul>
 
+<br>
 <button onclick="logout()">Logout</button>
 
 <script src="script.js"></script>
+
+</body>
+</html>

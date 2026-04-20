@@ -15,15 +15,12 @@ users = {
         "password": "1234"
     }
 }
-departments = []
-roles = []
-employees = []
+
 # -------------------------
 # OTP STORAGE
 # -------------------------
 otp_store = {}
 OTP_EXPIRY = 300
-
 
 # -------------------------
 # TASK STORAGE
@@ -33,7 +30,6 @@ assignments = []
 task_id_counter = 1
 assignment_id_counter = 1
 
-
 # -------------------------
 # HOME
 # -------------------------
@@ -41,11 +37,9 @@ assignment_id_counter = 1
 def home():
     return "HRM Backend Running"
 
-
 # -------------------------
-# LOGIN
+# LOGIN (FIXED ONLY HERE)
 # -------------------------
-
 @app.route('/login', methods=['POST'])
 def login():
     data = request.json
@@ -62,6 +56,7 @@ def login():
         "status": False,
         "message": "Invalid credentials"
     }), 401
+
 # -------------------------
 # SEND OTP
 # -------------------------
@@ -82,7 +77,6 @@ def send_otp():
     }
 
     return jsonify({"message": "OTP sent", "otp": otp})
-
 
 # -------------------------
 # VERIFY OTP
@@ -108,9 +102,8 @@ def verify_otp():
     record["verified"] = True
     return jsonify({"message": "OTP verified"})
 
-
 # -------------------------
-# RESET PASSWORD (FIXED - ONLY ONE FUNCTION)
+# RESET PASSWORD
 # -------------------------
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
@@ -122,20 +115,15 @@ def reset_password():
     if not record or not record["verified"]:
         return jsonify({"message": "OTP not verified"}), 400
 
-    # Always set password to 1234
     users[username]["password"] = "1234"
-
-    # Clear OTP
     del otp_store[username]
 
     return jsonify({"message": "Password reset to 1234"})
-
 
 # =====================================================
 # TASK MODULE
 # =====================================================
 
-# CREATE TASK
 @app.route('/create-task', methods=['POST'])
 def create_task():
     global task_id_counter, assignment_id_counter
@@ -169,27 +157,18 @@ def create_task():
     return jsonify({"message": "Task created"})
 
 
-# GET TASKS
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
-    status = request.args.get("status")
-    employee = request.args.get("employee_id")
-
     result = []
 
     for a in assignments:
-        if status and a["status"] != status:
-            continue
-        if employee and str(a["employee_id"]) != employee:
-            continue
-
         task = next((t for t in tasks if t["task_id"] == a["task_id"]), None)
 
         if task:
             result.append({
                 "assignment_id": a["assignment_id"],
                 "task_title": task["task_title"],
-                "priority": task["task_priority"],
+                "task_priority": task["task_priority"],
                 "status": a["status"],
                 "employee_id": a["employee_id"]
             })
@@ -197,7 +176,6 @@ def get_tasks():
     return jsonify(result)
 
 
-# UPDATE STATUS
 @app.route('/update-status/<int:id>', methods=['PUT'])
 def update_status(id):
     data = request.json
@@ -210,7 +188,6 @@ def update_status(id):
     return jsonify({"message": "Not found"}), 404
 
 
-# DELETE TASK
 @app.route('/delete-task/<int:id>', methods=['DELETE'])
 def delete_task(id):
     global tasks, assignments
@@ -221,7 +198,6 @@ def delete_task(id):
     return jsonify({"message": "Deleted"})
 
 
-# TASK STATS
 @app.route('/task-stats', methods=['GET'])
 def task_stats():
     stats = {"Pending": 0, "In Progress": 0, "Completed": 0}
@@ -231,9 +207,8 @@ def task_stats():
 
     return jsonify(stats)
 
-
 # -------------------------
-# RUN APP
+# RUN
 # -------------------------
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))

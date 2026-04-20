@@ -1,125 +1,133 @@
-console.log("updated");
-alert("JS LOADED");
-const BASE_URL = "https://hrm-system-eu3z.onrender.com";
+const API_URL = "https://hrm-system-eu3z.onrender.com";
 
-// ==============================
-// LOGIN
-// ==============================
-function login() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
+// =====================
+// DEPARTMENT
+// =====================
+async function addDepartment() {
+    const name = document.getElementById("name").value;
+    const desc = document.getElementById("description").value;
 
-    fetch(BASE_URL + "/login", {
+    await fetch(API_URL + "/departments", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ username, password })
-    })
-    .then(res => res.json())
-    .then(data => {
-        if (data.status) {
-            localStorage.setItem("login", "true");
-            window.location.href = "department.html";
-        } else {
-            document.getElementById("error").innerText = data.message;
-        }
-    })
-    .catch(() => {
-        document.getElementById("error").innerText = "Server error";
+        body: JSON.stringify({ name, desc })
     });
+
+    loadDepartments();
 }
 
-// FORGOT PASSWORD NAVIGATION
-function goToForgot() {
-    window.location.href = "forgot.html";
+async function loadDepartments() {
+    const res = await fetch(API_URL + "/departments");
+    const data = await res.json();
+
+    let html = "";
+    let dropdown = "";
+
+    data.forEach((d, i) => {
+        html += `<li>${d.name} <button onclick="deleteDepartment(${i})">Delete</button></li>`;
+        dropdown += `<option value="${d.name}">${d.name}</option>`;
+    });
+
+    document.getElementById("departmentList").innerHTML = html;
+    document.getElementById("department").innerHTML = dropdown;
+}
+
+async function deleteDepartment(index) {
+    await fetch(API_URL + "/departments/delete/" + index, {
+        method: "DELETE"
+    });
+    loadDepartments();
 }
 
 
-// ==============================
-// TASK MODULE
-// ==============================
+// =====================
+// ROLE
+// =====================
+async function addRole() {
+    const name = document.getElementById("roleName").value;
+    const desc = document.getElementById("roleDesc").value;
 
-// CREATE TASK
-async function createTask() {
+    await fetch(API_URL + "/roles", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ name, desc })
+    });
+
+    loadRoles();
+}
+
+async function loadRoles() {
+    const res = await fetch(API_URL + "/roles");
+    const data = await res.json();
+
+    let html = "";
+    let dropdown = "";
+
+    data.forEach(r => {
+        html += `<li>${r.name}</li>`;
+        dropdown += `<option value="${r.name}">${r.name}</option>`;
+    });
+
+    document.getElementById("roleList").innerHTML = html;
+    document.getElementById("role").innerHTML = dropdown;
+}
+
+
+// =====================
+// EMPLOYEE
+// =====================
+async function addEmployee() {
     const data = {
-        task_title: document.getElementById("task_title").value,
-        task_description: document.getElementById("task_description").value,
-        task_priority: document.getElementById("task_priority").value,
-        start_date: document.getElementById("start_date").value,
-        end_date: document.getElementById("end_date").value,
-        task_type: document.getElementById("task_type").value,
-        employee_id: document.getElementById("employee_id").value
+        fname: document.getElementById("firstName").value,
+        lname: document.getElementById("lastName").value,
+        email: document.getElementById("email").value,
+        mobile: document.getElementById("mobile").value,
+        department: document.getElementById("department").value,
+        role: document.getElementById("role").value,
+        manager: document.getElementById("manager").value
     };
 
-    const res = await fetch(BASE_URL + "/create-task", {
+    await fetch(API_URL + "/employees", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
         body: JSON.stringify(data)
     });
 
-    const result = await res.json();
-    alert(result.message);
-
-    loadTasks();
+    loadEmployees();
 }
 
-// LOAD TASKS
-async function loadTasks() {
-    const res = await fetch(BASE_URL + "/tasks");
+async function loadEmployees() {
+    const res = await fetch(API_URL + "/employees");
     const data = await res.json();
 
     let html = "";
 
-    data.forEach(t => {
-        html += `
-        <tr>
-            <td>${t.task_title}</td>
-            <td>${t.priority}</td>
-            <td>${t.status}</td>
-            <td>
-                <button onclick="updateTaskStatus(${t.assignment_id}, 'Completed')">Complete</button>
-            </td>
-        </tr>
-        `;
+    data.forEach(e => {
+        html += `<li>${e.fname} (${e.department})</li>`;
     });
 
-    document.getElementById("taskTable").innerHTML = html;
+    document.getElementById("employeeList").innerHTML = html;
 }
 
-// UPDATE STATUS
-async function updateTaskStatus(id, status) {
-    await fetch(BASE_URL + "/update-status/" + id, {
-        method: "PUT",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ status })
-    });
 
-    loadTasks();
+// =====================
+// NAVIGATION
+// =====================
+function goToTask() {
+    window.location.href = "task.html";
 }
 
-function addDepartment() {
-    const name = document.getElementById("name").value;
-    const desc = document.getElementById("description").value;
-
-    const li = `<li>${name} - ${desc}</li>`;
-    document.getElementById("departmentList").innerHTML += li;
-}
-
-function addRole() {
-    const name = document.getElementById("roleName").value;
-    const desc = document.getElementById("roleDesc").value;
-
-    const li = `<li>${name} - ${desc}</li>`;
-    document.getElementById("roleList").innerHTML += li;
-}
-
-function addEmployee() {
-    const fname = document.getElementById("firstName").value;
-    const lname = document.getElementById("lastName").value;
-
-    const li = `<li>${fname} ${lname}</li>`;
-    document.getElementById("employeeList").innerHTML += li;
-}
 function logout() {
     localStorage.removeItem("login");
     window.location.href = "index.html";
 }
+
+
+// =====================
+// AUTO LOAD
+// =====================
+window.onload = function () {
+    loadDepartments();
+    loadRoles();
+    loadEmployees();
+};

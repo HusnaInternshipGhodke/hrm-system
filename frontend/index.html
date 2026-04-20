@@ -19,24 +19,27 @@
 <script>
 const API_URL = "https://hrm-system-eu3z.onrender.com";
 
-async function login() {
-    const username = document.getElementById("username").value;
-    const password = document.getElementById("password").value;
-
-    const res = await fetch(API_URL + "/login", {
+function login() {
+    fetch(API_URL + "/login", {
         method: "POST",
         headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({ username, password })
+        body: JSON.stringify({
+            username: document.getElementById("username").value,
+            password: document.getElementById("password").value
+        })
+    })
+    .then(res => res.json())
+    .then(data => {
+        if (data.status) {
+            localStorage.setItem("login", "true");
+            window.location.href = "department.html";
+        } else {
+            document.getElementById("error").innerText = data.message;
+        }
+    })
+    .catch(() => {
+        document.getElementById("error").innerText = "Server error";
     });
-
-    const data = await res.json();
-
-    if (data.status) {
-        localStorage.setItem("login", "true");
-        window.location.href = "department.html";
-    } else {
-        document.getElementById("error").innerText = data.message;
-    }
 }
 </script>
 
