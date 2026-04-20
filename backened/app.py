@@ -23,7 +23,7 @@ otp_store = {}
 OTP_EXPIRY = 300
 
 # -------------------------
-# NEW STORAGE (ADDED ONLY)
+# STORAGE
 # -------------------------
 departments = []
 roles = []
@@ -42,6 +42,12 @@ task_id_counter = 1
 assignment_id_counter = 1
 
 # -------------------------
+# REVIEW STORAGE (MODULE 5)
+# -------------------------
+reviews = []
+review_id_counter = 1
+
+# -------------------------
 # HOME
 # -------------------------
 @app.route('/')
@@ -49,7 +55,7 @@ def home():
     return "HRM Backend Running"
 
 # -------------------------
-# LOGIN (ONLY FIXED RESPONSE)
+# LOGIN
 # -------------------------
 @app.route('/login', methods=['POST'])
 def login():
@@ -120,7 +126,7 @@ def reset_password():
     return jsonify({"message": "Password reset to 1234"})
 
 # =====================================================
-# DEPARTMENT APIs
+# DEPARTMENT
 # =====================================================
 @app.route('/departments', methods=['GET'])
 def get_departments():
@@ -147,7 +153,7 @@ def restore_department(index):
     return jsonify({"message": "Restored"})
 
 # =====================================================
-# ROLE APIs
+# ROLE
 # =====================================================
 @app.route('/roles', methods=['GET'])
 def get_roles():
@@ -174,7 +180,7 @@ def restore_role(index):
     return jsonify({"message": "Restored"})
 
 # =====================================================
-# EMPLOYEE APIs
+# EMPLOYEE
 # =====================================================
 @app.route('/employees', methods=['GET'])
 def get_employees():
@@ -201,7 +207,7 @@ def restore_employee(index):
     return jsonify({"message": "Restored"})
 
 # =====================================================
-# TASK MODULE (UNCHANGED)
+# TASK MODULE
 # =====================================================
 @app.route('/create-task', methods=['POST'])
 def create_task():
@@ -263,6 +269,43 @@ def update_status(id):
             return jsonify({"message": "Updated"})
 
     return jsonify({"message": "Not found"}), 404
+
+# =====================================================
+# ✅ MODULE 5: PERFORMANCE REVIEW
+# =====================================================
+@app.route('/add-review', methods=['POST'])
+def add_review():
+    global review_id_counter
+
+    data = request.json
+
+    review = {
+        "review_id": review_id_counter,
+        "review_title": data.get("review_title"),
+        "review_date": data.get("review_date"),
+        "employee_id": data.get("employee_id"),
+        "reviewed_by": data.get("reviewed_by"),
+        "review_period": data.get("review_period"),
+        "rating": data.get("rating"),
+        "comments": data.get("comments"),
+        "created_at": time.strftime("%Y-%m-%d %H:%M:%S"),
+        "updated_at": time.strftime("%Y-%m-%d %H:%M:%S")
+    }
+
+    reviews.append(review)
+    review_id_counter += 1
+
+    return jsonify({"message": "Review added"})
+
+@app.route('/reviews', methods=['GET'])
+def get_reviews():
+    return jsonify(reviews)
+
+@app.route('/delete-review/<int:id>', methods=['DELETE'])
+def delete_review(id):
+    global reviews
+    reviews = [r for r in reviews if r["review_id"] != id]
+    return jsonify({"message": "Deleted"})
 
 # -------------------------
 # RUN
