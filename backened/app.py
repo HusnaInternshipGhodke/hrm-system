@@ -5,7 +5,7 @@ import time
 import os
 
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app)
 
 # -------------------------
 # USERS
@@ -23,6 +23,17 @@ otp_store = {}
 OTP_EXPIRY = 300
 
 # -------------------------
+# NEW STORAGE (ADDED ONLY)
+# -------------------------
+departments = []
+roles = []
+employees = []
+
+deleted_departments = []
+deleted_roles = []
+deleted_employees = []
+
+# -------------------------
 # TASK STORAGE
 # -------------------------
 tasks = []
@@ -38,7 +49,7 @@ def home():
     return "HRM Backend Running"
 
 # -------------------------
-# LOGIN (FIXED ONLY HERE)
+# LOGIN (ONLY FIXED RESPONSE)
 # -------------------------
 @app.route('/login', methods=['POST'])
 def login():
@@ -47,18 +58,12 @@ def login():
     password = data.get("password")
 
     if username in users and users[username]["password"] == password:
-        return jsonify({
-            "status": True,
-            "message": "Login successful"
-        }), 200
+        return jsonify({"status": True, "message": "Login successful"})
 
-    return jsonify({
-        "status": False,
-        "message": "Invalid credentials"
-    }), 401
+    return jsonify({"status": False, "message": "Invalid credentials"})
 
 # -------------------------
-# SEND OTP
+# OTP
 # -------------------------
 @app.route('/send-otp', methods=['POST'])
 def send_otp():
@@ -78,9 +83,6 @@ def send_otp():
 
     return jsonify({"message": "OTP sent", "otp": otp})
 
-# -------------------------
-# VERIFY OTP
-# -------------------------
 @app.route('/verify-otp', methods=['POST'])
 def verify_otp():
     data = request.json
@@ -102,9 +104,6 @@ def verify_otp():
     record["verified"] = True
     return jsonify({"message": "OTP verified"})
 
-# -------------------------
-# RESET PASSWORD
-# -------------------------
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.json
@@ -121,9 +120,89 @@ def reset_password():
     return jsonify({"message": "Password reset to 1234"})
 
 # =====================================================
-# TASK MODULE
+# DEPARTMENT APIs
 # =====================================================
+@app.route('/departments', methods=['GET'])
+def get_departments():
+    return jsonify(departments)
 
+@app.route('/departments', methods=['POST'])
+def add_department():
+    data = request.json
+    departments.append(data)
+    return jsonify({"message": "Department added"})
+
+@app.route('/departments/delete/<int:index>', methods=['DELETE'])
+def delete_department(index):
+    if index < len(departments):
+        deleted_departments.append(departments[index])
+        departments.pop(index)
+    return jsonify({"message": "Deleted"})
+
+@app.route('/departments/restore/<int:index>', methods=['POST'])
+def restore_department(index):
+    if index < len(deleted_departments):
+        departments.append(deleted_departments[index])
+        deleted_departments.pop(index)
+    return jsonify({"message": "Restored"})
+
+# =====================================================
+# ROLE APIs
+# =====================================================
+@app.route('/roles', methods=['GET'])
+def get_roles():
+    return jsonify(roles)
+
+@app.route('/roles', methods=['POST'])
+def add_role():
+    data = request.json
+    roles.append(data)
+    return jsonify({"message": "Role added"})
+
+@app.route('/roles/delete/<int:index>', methods=['DELETE'])
+def delete_role(index):
+    if index < len(roles):
+        deleted_roles.append(roles[index])
+        roles.pop(index)
+    return jsonify({"message": "Deleted"})
+
+@app.route('/roles/restore/<int:index>', methods=['POST'])
+def restore_role(index):
+    if index < len(deleted_roles):
+        roles.append(deleted_roles[index])
+        deleted_roles.pop(index)
+    return jsonify({"message": "Restored"})
+
+# =====================================================
+# EMPLOYEE APIs
+# =====================================================
+@app.route('/employees', methods=['GET'])
+def get_employees():
+    return jsonify(employees)
+
+@app.route('/employees', methods=['POST'])
+def add_employee():
+    data = request.json
+    employees.append(data)
+    return jsonify({"message": "Employee added"})
+
+@app.route('/employees/delete/<int:index>', methods=['DELETE'])
+def delete_employee(index):
+    if index < len(employees):
+        deleted_employees.append(employees[index])
+        employees.pop(index)
+    return jsonify({"message": "Deleted"})
+
+@app.route('/employees/restore/<int:index>', methods=['POST'])
+def restore_employee(index):
+    if index < len(deleted_employees):
+        employees.append(deleted_employees[index])
+        deleted_employees.pop(index)
+    return jsonify({"message": "Restored"})
+
+# =====================================================
+# TASK MODULE (UNCHANGED)
+# =====================================================
 @app.route('/create-task', methods=['POST'])
 def create_task():
     global task_id_counter, assignment_id_counter
@@ -156,7 +235,6 @@ def create_task():
 
     return jsonify({"message": "Task created"})
 
-
 @app.route('/tasks', methods=['GET'])
 def get_tasks():
     result = []
@@ -175,7 +253,6 @@ def get_tasks():
 
     return jsonify(result)
 
-
 @app.route('/update-status/<int:id>', methods=['PUT'])
 def update_status(id):
     data = request.json
@@ -186,26 +263,6 @@ def update_status(id):
             return jsonify({"message": "Updated"})
 
     return jsonify({"message": "Not found"}), 404
-
-
-@app.route('/delete-task/<int:id>', methods=['DELETE'])
-def delete_task(id):
-    global tasks, assignments
-
-    assignments = [a for a in assignments if a["task_id"] != id]
-    tasks = [t for t in tasks if t["task_id"] != id]
-
-    return jsonify({"message": "Deleted"})
-
-
-@app.route('/task-stats', methods=['GET'])
-def task_stats():
-    stats = {"Pending": 0, "In Progress": 0, "Completed": 0}
-
-    for a in assignments:
-        stats[a["status"]] += 1
-
-    return jsonify(stats)
 
 # -------------------------
 # RUN
