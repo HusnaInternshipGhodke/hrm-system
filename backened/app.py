@@ -127,3 +127,103 @@ def reset_password():
 if __name__ == '__main__':
     port = int(os.environ.get("PORT", 5000))
     app.run(host='0.0.0.0', port=port)
+
+    # -------------------------
+# TASK STORAGE
+# -------------------------
+tasks = []
+task_assignments = []
+task_id_counter = 1
+assignment_id_counter = 1
+
+
+# -------------------------
+# CREATE TASK
+# -------------------------
+@app.route('/create-task', methods=['POST'])
+def create_task():
+    global task_id_counter, assignment_id_counter
+
+    data = request.json
+
+    task = {
+        "task_id": task_id_counter,
+        "task_title": data.get("task_title"),
+        "task_description": data.get("task_description"),
+        "task_priority": data.get("task_priority"),
+        "start_date": data.get("start_date"),
+        "end_date": data.get("end_date"),
+        "task_type": data.get("task_type"),
+        "created_at": time.time(),
+        "updated_at": time.time()
+    }
+
+    tasks.append(task)
+
+    assignment = {
+        "assignment_id": assignment_id_counter,
+        "task_id": task_id_counter,
+        "employee_id": data.get("employee_id"),
+        "assigned_by": "admin",
+        "assigned_date": time.time(),
+        "status": "Pending",
+        "completed_at": None
+    }
+
+    task_assignments.append(assignment)
+
+    task_id_counter += 1
+    assignment_id_counter += 1
+
+    return jsonify({"message": "Task created successfully"})
+
+
+# -------------------------
+# GET TASKS
+# -------------------------
+@app.route('/tasks', methods=['GET'])
+def get_tasks():
+    result = []
+
+    for a in task_assignments:
+        task = next((t for t in tasks if t["task_id"] == a["task_id"]), None)
+
+        result.append({
+            "assignment_id": a["assignment_id"],
+            "task_title": task["task_title"],
+            "task_priority": task["task_priority"],
+            "status": a["status"],
+            "employee_id": a["employee_id"]
+        })
+
+    return jsonify(result)
+
+
+# -------------------------
+# UPDATE TASK STATUS
+# -------------------------
+@app.route('/update-status/<int:assignment_id>', methods=['PUT'])
+def update_status(assignment_id):
+    data = request.json
+
+    for a in task_assignments:
+        if a["assignment_id"] == assignment_id:
+            a["status"] = data.get("status")
+
+            if a["status"] == "Completed":
+                a["completed_at"] = time.time()
+
+            return jsonify({"message": "Status updated"})
+
+    return jsonify({"message": "Not found"}), 404
+
+
+# -------------------------
+# DELETE TASK
+# -------------------------
+@app.route('/delete-task/<int:task_id>', methods=['DELETE'])
+def delete_task(task_id):
+    global tasks
+    tasks = [t for t in tasks if t["task_id"] != task_id]
+
+    return jsonify({"message": "Task deleted"})

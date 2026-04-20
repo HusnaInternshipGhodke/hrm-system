@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Task Management</title>
+</head>
+<body>
+
+<h2>Task Management</h2>
+
+<h3>Create Task</h3>
+
+<input type="text" id="title" placeholder="Task Title"><br><br>
+<input type="text" id="desc" placeholder="Description"><br><br>
+
+<select id="priority">
+    <option>High</option>
+    <option>Medium</option>
+    <option>Low</option>
+</select><br><br>
+
+<input type="date" id="start"><br><br>
+<input type="date" id="end"><br><br>
+
+<select id="type">
+    <option>Individual</option>
+    <option>Team</option>
+</select><br><br>
+
+<input type="text" id="employee" placeholder="Employee ID"><br><br>
+
+<button onclick="createTask()">Create Task</button>
+
+<hr>
+
+<h3>Task List</h3>
+<table border="1">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Priority</th>
+            <th>Status</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="taskTable"></tbody>
+</table>
+
+<script>
+const BASE_URL = "https://hrm-system-eu3z.onrender.com";
+
+async function createTask() {
+    const res = await fetch(BASE_URL + "/create-task", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({
+            task_title: document.getElementById("title").value,
+            task_description: document.getElementById("desc").value,
+            task_priority: document.getElementById("priority").value,
+            start_date: document.getElementById("start").value,
+            end_date: document.getElementById("end").value,
+            task_type: document.getElementById("type").value,
+            employee_id: document.getElementById("employee").value
+        })
+    });
+
+    alert("Task Created");
+    loadTasks();
+}
+
+
+async function loadTasks() {
+    const res = await fetch(BASE_URL + "/tasks");
+    const data = await res.json();
+
+    let html = "";
+
+    data.forEach(t => {
+        html += `
+        <tr>
+            <td>${t.task_title}</td>
+            <td>${t.task_priority}</td>
+            <td>${t.status}</td>
+            <td>
+                <button onclick="updateStatus(${t.assignment_id}, 'Completed')">Complete</button>
+            </td>
+        </tr>`;
+    });
+
+    document.getElementById("taskTable").innerHTML = html;
+}
+
+
+async function updateStatus(id, status) {
+    await fetch(BASE_URL + "/update-status/" + id, {
+        method: "PUT",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify({ status })
+    });
+
+    loadTasks();
+}
+
+// Load on start
+loadTasks();
+</script>
+
+</body>
+</html>
