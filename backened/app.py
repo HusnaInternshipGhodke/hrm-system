@@ -108,19 +108,24 @@ def verify_otp():
 @app.route('/reset-password', methods=['POST'])
 def reset_password():
     data = request.json
+   @app.route('/reset-password', methods=['POST'])
+def reset_password():
+    data = request.json
     username = data.get("username")
-    new_password = data.get("new_password")
 
     record = otp_store.get(username)
 
     if not record or not record["verified"]:
         return jsonify({"message": "OTP not verified"}), 400
 
-    users[username]["password"] = new_password
+    # Always set password to 1234
+    users[username]["password"] = "1234"
+
+    # Clear OTP
     del otp_store[username]
 
-    return jsonify({"message": "Password reset successful"})
-
+    return jsonify({"message": "Password reset to 1234"})
+    
 
 # =====================================================
 # TASK MODULE (PDF BASED)
