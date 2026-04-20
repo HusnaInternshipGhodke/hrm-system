@@ -1,14 +1,17 @@
 const BASE_URL = "https://hrm-system-eu3z.onrender.com";
 
-// LOAD EMPLOYEES IN DROPDOWN
+let employees = [];
+
+// LOAD EMPLOYEES
 async function loadEmployees() {
     const res = await fetch(BASE_URL + "/employees");
-    const data = await res.json();
+    employees = await res.json();
 
-    let options = "";
+    let options = "<option value=''>Select Employee</option>";
 
-    data.forEach((e, i) => {
-        options += `<option value="${i}">${e.fname}</option>`;
+    employees.forEach((e, i) => {
+        const name = e.fname || e.name || ("Employee " + i);
+        options += `<option value="${i}">${name}</option>`;
     });
 
     document.getElementById("employee").innerHTML = options;
@@ -17,10 +20,18 @@ async function loadEmployees() {
 
 // ADD REVIEW
 async function addReview() {
+
+    const employeeId = document.getElementById("employee").value;
+
+    if (!employeeId) {
+        alert("Please select employee");
+        return;
+    }
+
     const data = {
         review_title: document.getElementById("title").value,
         review_date: document.getElementById("date").value,
-        employee_id: document.getElementById("employee").value,
+        employee_id: employeeId,
         reviewed_by: "admin",
         review_period: document.getElementById("period").value,
         rating: document.getElementById("rating").value,
@@ -34,6 +45,11 @@ async function addReview() {
     });
 
     alert("Review Added");
+
+    document.getElementById("title").value = "";
+    document.getElementById("rating").value = "";
+    document.getElementById("comments").value = "";
+
     loadReviews();
 }
 
@@ -46,10 +62,14 @@ async function loadReviews() {
     let html = "";
 
     data.forEach(r => {
+
+        const emp = employees[r.employee_id];
+        const empName = emp ? (emp.fname || emp.name) : "Unknown";
+
         html += `
         <tr>
             <td>${r.review_title}</td>
-            <td>${r.employee_id}</td>
+            <td>${empName}</td>
             <td>${r.review_period}</td>
             <td>${r.rating}</td>
             <td>
@@ -73,7 +93,7 @@ async function deleteReview(id) {
 
 
 // LOAD ON START
-window.onload = function () {
-    loadEmployees();
+window.onload = async function () {
+    await loadEmployees();
     loadReviews();
 };

@@ -15,7 +15,18 @@ async function addDepartment() {
 
     loadDepartments();
 }
+async function loadEmployeeDropdown() {
+    const res = await fetch(API_URL + "/employees");
+    const data = await res.json();
 
+    let options = "<option value=''>Select Employee</option>";
+
+    data.forEach((e, i) => {
+        options += `<option value="${i}">${e.fname} ${e.lname}</option>`;
+    });
+
+    document.getElementById("employee").innerHTML = options;
+}
 async function loadDepartments() {
     const res = await fetch(API_URL + "/departments");
     const data = await res.json();
@@ -144,4 +155,5 @@ window.onload = function () {
     loadDepartments();
     loadRoles();
     loadEmployees();
+    loadEmployeeDropdown();   // ✅ ADD THIS
 };
