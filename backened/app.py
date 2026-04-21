@@ -307,6 +307,102 @@ def delete_review(id):
     reviews = [r for r in reviews if r["review_id"] != id]
     return jsonify({"message": "Deleted"})
 
+# =====================================================
+# ✅ MODULE 6: LEAVE MANAGEMENT
+# =====================================================
+
+leaves = []
+leave_id_counter = 1
+
+leave_quota = []
+quota_id_counter = 1
+
+
+# APPLY LEAVE
+@app.route('/apply-leave', methods=['POST'])
+def apply_leave():
+    global leave_id_counter
+
+    data = request.json
+
+    leave = {
+        "leave_id": leave_id_counter,
+        "employee_id": data.get("employee_id"),
+        "leave_type": data.get("leave_type"),
+        "reason": data.get("reason"),
+        "start_date": data.get("start_date"),
+        "end_date": data.get("end_date"),
+        "status": "pending"
+    }
+
+    leaves.append(leave)
+    leave_id_counter += 1
+
+    return jsonify({"message": "Leave Applied"})
+
+
+# GET LEAVES
+@app.route('/leaves', methods=['GET'])
+def get_leaves():
+    return jsonify(leaves)
+
+
+# UPDATE (Employee edit before approval)
+@app.route('/update-leave/<int:id>', methods=['PUT'])
+def update_leave(id):
+    data = request.json
+
+    for l in leaves:
+        if l["leave_id"] == id:
+            if l["status"] == "pending":
+                l["leave_type"] = data.get("leave_type")
+                l["reason"] = data.get("reason")
+                return jsonify({"message": "Updated"})
+            else:
+                return jsonify({"message": "Cannot edit approved/rejected"}), 400
+
+    return jsonify({"message": "Not found"}), 404
+
+
+# APPROVE / REJECT (Manager)
+@app.route('/approve-leave/<int:id>', methods=['PUT'])
+def approve_leave(id):
+    data = request.json
+
+    for l in leaves:
+        if l["leave_id"] == id:
+            l["status"] = data.get("status")
+            return jsonify({"message": "Status Updated"})
+
+    return jsonify({"message": "Not found"}), 404
+
+
+# ADD LEAVE QUOTA
+@app.route('/add-quota', methods=['POST'])
+def add_quota():
+    global quota_id_counter
+
+    data = request.json
+
+    quota = {
+        "quota_id": quota_id_counter,
+        "employee_id": data.get("employee_id"),
+        "leave_type": data.get("leave_type"),
+        "total_quota": data.get("total_quota"),
+        "used_quota": 0,
+        "remain_quota": data.get("total_quota")
+    }
+
+    leave_quota.append(quota)
+    quota_id_counter += 1
+
+    return jsonify({"message": "Quota Added"})
+
+
+# GET QUOTA
+@app.route('/quota', methods=['GET'])
+def get_quota():
+    return jsonify(leave_quota)
 # -------------------------
 # RUN
 # -------------------------

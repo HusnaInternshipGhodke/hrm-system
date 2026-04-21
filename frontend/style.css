@@ -1,0 +1,99 @@
+/* GLOBAL */
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: #f4f7fb;
+    margin: 0;
+    padding: 20px;
+}
+
+/* HEADINGS */
+h2 {
+    text-align: center;
+    color: #333;
+}
+
+h3 {
+    color: #555;
+    margin-top: 30px;
+}
+
+/* FORM SECTION */
+form, .form-box {
+    background: white;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+    margin-bottom: 20px;
+}
+
+/* INPUTS */
+input, select {
+    padding: 10px;
+    margin: 8px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 180px;
+}
+
+/* BUTTON */
+button {
+    padding: 10px 15px;
+    background: linear-gradient(45deg, #007bff, #00c6ff);
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+button:hover {
+    transform: scale(1.05);
+    background: linear-gradient(45deg, #0056b3, #0099cc);
+}
+
+/* TABLE */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 0px 4px 10px rgba(0,0,0,0.1);
+}
+
+th {
+    background: #007bff;
+    color: white;
+    padding: 12px;
+}
+
+td {
+    padding: 10px;
+    text-align: center;
+    border-bottom: 1px solid #eee;
+}
+
+/* STATUS COLORS */
+.pending {
+    color: orange;
+    font-weight: bold;
+}
+
+.approved {
+    color: green;
+    font-weight: bold;
+}
+
+.rejected {
+    color: red;
+    font-weight: bold;
+}
+
+/* CARD STYLE */
+.card {
+    background: white;
+    padding: 20px;
+    border-radius: 12px;
+    margin: 20px 0;
+    box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+}

@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Leave Management</title>
+
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        input, select { padding: 8px; margin: 5px; }
+        button { padding: 8px 12px; background: blue; color: white; border: none; }
+        table { margin-top: 20px; border-collapse: collapse; width: 100%; }
+        th, td { padding: 10px; border: 1px solid #ccc; }
+        .pending { color: orange; }
+        .approved { color: green; }
+        .rejected { color: red; }
+    </style>
+</head>
+<body>
+
+<h2>Leave Management System</h2>
+
+<h3>Apply Leave</h3>
+
+<select id="employee"></select>
+<select id="type">
+    <option>PL</option>
+    <option>CL</option>
+    <option>SL</option>
+</select>
+<div class="card">
+<input type="date" id="start">
+<input type="date" id="end">
+<input placeholder="Reason" id="reason">
+</div>
+<button onclick="applyLeave()">Apply</button>
+
+<hr>
+
+<h3>Leave Dashboard</h3>
+
+<table>
+<thead>
+<tr>
+<th>Employee</th>
+<th>Type</th>
+<th>Dates</th>
+<th>Status</th>
+<th>Action</th>
+</tr>
+</thead>
+<tbody id="table"></tbody>
+</table>
+
+<script src="leave.js"></script>
+
+</body>
+</html>
